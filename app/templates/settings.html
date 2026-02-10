@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frpc Configurator - 设置</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="container-fluid">
+        <div class="container nav-inner">
+            <div class="brand">
+                <span class="logo">FR</span>
+                <span>Frpc Configurator</span>
+            </div>
+            <div class="menu-toggle" id="mobile-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/config">Config</a></li>
+                <li><a href="/settings" class="active">Settings</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container page">
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <div class="eyebrow">Settings</div>
+                    <h2>快速访问目标</h2>
+                    <p class="muted">主页的一键访问会使用这里的目标 IP。</p>
+                </div>
+            </div>
+            <form method="POST" action="/settings">
+                <label for="target_ip">快速访问的目标IP</label>
+                <input type="text" id="target_ip" name="target_ip" value="{{ target_ip }}" placeholder="请输入目标IP地址">
+                <button type="submit">保存设置</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <div class="eyebrow">About</div>
+                    <h2>关于 Frpc Configurator</h2>
+                    <p class="muted">轻松管理 frp 客户端代理配置。</p>
+                </div>
+            </div>
+            <p>此应用程序允许您通过 Web 界面轻松配置和管理 frp 客户端设置。</p>
+            <p>功能特性:</p>
+            <ul>
+                <li>通过CRUD操作轻松管理代理</li>
+                <li>可自定义代理显示名称</li>
+                <li>可切换主页上代理的可见性</li>
+                <li>快速访问您的服务</li>
+            </ul>
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+serverAddr = "luckyancj.site"
+serverPort = 7000
+[[proxies]]
+name = "alist"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 5234
+remotePort = 5233
+
+[[proxies]]
+name = "ver"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 8999
+remotePort = 8999
+
+[[proxies]]
+name = "fetchbuild"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 8068
+remotePort = 5000
+
+[[proxies]]
+name = "dst1"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 1092
+remotePort = 13998
+
+[[proxies]]
+name = "dst2"
+type = "udp"
+localIP = "127.0.0.1"
+localPort = 10999
+remotePort = 10999
+
+[[proxies]]
+name = "dst-web"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 18081
+remotePort = 18082
+
+[[proxies]]
+name = "test"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 8080
+remotePort = 8080
+
+[[proxies]]
+name = "test2"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 8081
+remotePort = 8081
+
+[[proxies]]
+name = "test3"
+type = "udp"
+localIP = "127.0.0.1"
+localPort = 9091
+remotePort = 9091
+
+[[proxies]]
+name = "212"
+type = "udp"
+localIP = "127.0.0.1"
+localPort = 121
+remotePort = 212
+
+[[proxies]]
+name = "231"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 313
+remotePort = 133
+
+[auth]
+method = "token"
+token = "tokenyancj"
+
+[transport.tls]
+enable = false

@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./frpc.toml:/app/frpc.toml
+      - ./app_config.json:/app/app_config.json
+    restart: unless-stopped
+
+  frpc:
+    image: snowdreamtech/frpc
+    volumes:
+      - ./frpc.toml:/etc/frp/frpc.toml
+    network_mode: "host"
+    restart: unless-stopped
+    depends_on:
+      - app

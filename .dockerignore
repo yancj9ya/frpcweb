@@ -1,0 +1,21 @@
+# Git
+.git
+.gitignore
+
+# VS Code
+.vscode/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Local development files
+page.html
+css_content.txt
+
+# OS-specific
+.DS_Store
+Thumbs.db

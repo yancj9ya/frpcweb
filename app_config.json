@@ -1,0 +1,41 @@
+{
+  "target_ip": "192.168.12.1",
+  "proxies_display": {
+    "alist": {
+      "displayName": "openlist121",
+      "visible": true
+    },
+    "palgame": {
+      "visible": false,
+      "displayName": "palgame"
+    },
+    "clashudp": {
+      "visible": false,
+      "displayName": "clashudp"
+    },
+    "palgamet": {
+      "visible": false,
+      "displayName": "palgamet"
+    },
+    "ver": {
+      "visible": true,
+      "displayName": "ver"
+    },
+    "dst1": {
+      "displayName": "dst1",
+      "visible": true
+    },
+    "dst2": {
+      "displayName": "dst2",
+      "visible": true
+    },
+    "test3": {
+      "displayName": "Test Proxy 3",
+      "visible": true
+    },
+    "dst-web": {
+      "displayName": "dst-web",
+      "visible": true
+    }
+  }
+}

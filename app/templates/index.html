@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frpc Configurator - 首页</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="container-fluid">
+        <div class="container nav-inner">
+            <div class="brand">
+                <span class="logo">FR</span>
+                <span>Frpc Configurator</span>
+            </div>
+            <div class="menu-toggle" id="mobile-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="/" class="active">Home</a></li>
+                <li><a href="/config">Config</a></li>
+                <li><a href="/settings">Settings</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container page">
+        <section class="card hero">
+            <div class="card-header">
+                <div>
+                    <div class="eyebrow">Quick Access</div>
+                    <h2 class="hero-title">一键访问入口</h2>
+                    <p class="muted">点击任意代理即可直接打开服务。</p>
+                </div>
+                <div class="hero-meta">目标 IP: {{ target_ip }}</div>
+            </div>
+
+            {% if proxies %}
+                <div class="proxy-grid">
+                    {% for proxy in proxies %}
+                    <div class="proxy-card fade-in">
+                        <span class="badge">{{ proxy.type.upper() }}</span>
+                        <h3>{{ proxy.displayName }}</h3>
+                        <div class="meta">本地 {{ proxy.localIP }}:{{ proxy.localPort }}</div>
+                        <div class="port">远程端口 {{ proxy.remotePort }}</div>
+                        <a href="http://{{ target_ip }}:{{ proxy.localPort }}" target="_blank" role="button">打开服务</a>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="muted">暂无配置或可见的代理。请前往 <a href="/config">配置页面</a> 添加。</p>
+            {% endif %}
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

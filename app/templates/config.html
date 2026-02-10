@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frpc Configurator - 配置</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="container-fluid">
+        <div class="container nav-inner">
+            <div class="brand">
+                <span class="logo">FR</span>
+                <span>Frpc Configurator</span>
+            </div>
+            <div class="menu-toggle" id="mobile-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/config" class="active">Config</a></li>
+                <li><a href="/settings">Settings</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container page config-page">
+        <section class="card hero">
+            <div class="card-header">
+                <div>
+                    <div class="eyebrow">Control Center</div>
+                    <h2 class="hero-title">代理管理台</h2>
+                    <p class="muted">添加、编辑与发布你的 frp 代理配置。</p>
+                </div>
+                <div class="hero-meta">共 {{ proxies|length }} 个代理</div>
+            </div>
+        </section>
+
+        <section class="config-layout">
+            <div class="card config-create">
+                <div class="card-header">
+                    <div>
+                        <div class="eyebrow">Create</div>
+                        <h2>添加代理</h2>
+                        <p class="muted">快速创建新的代理条目。</p>
+                    </div>
+                </div>
+                <form method="POST" action="/add_proxy" class="stack">
+                    <div class="grid">
+                        <input type="text" name="name" placeholder="Proxy Name" required>
+                        <select name="type" required>
+                            <option value="" disabled selected>Select Type</option>
+                            <option value="tcp">TCP</option>
+                            <option value="udp">UDP</option>
+                        </select>
+                        <input type="text" name="local_ip" placeholder="Local IP" value="127.0.0.1" required>
+                        <input type="number" name="local_port" placeholder="Local Port" required>
+                        <input type="number" name="remote_port" placeholder="Remote Port" required>
+                    </div>
+                    <button type="submit">添加代理</button>
+                </form>
+            </div>
+
+            <div class="card config-manage">
+                <div class="card-header">
+                    <div>
+                        <div class="eyebrow">Manage</div>
+                        <h2>代理配置列表</h2>
+                        <p class="muted">逐条编辑并立即更新配置。</p>
+                    </div>
+                </div>
+                {% if proxies %}
+                <div class="proxy-list">
+                    {% for proxy in proxies %}
+                    <div class="proxy-item fade-in">
+                        <div class="proxy-item-header">
+                            <div class="proxy-title">
+                                <span class="badge">{{ proxy.type.upper() }}</span>
+                                <h3>{{ proxy.name }}</h3>
+                            </div>
+                            <div class="proxy-actions">
+                                <button onclick="updateProxy('{{ proxy.name }}')" class="secondary">更新</button>
+                                <a href="/delete_proxy/{{ proxy.name }}" class="warning delete-btn" onclick="return confirm('确定要删除这个代理吗？此操作无法撤销')">删除</a>
+                            </div>
+                        </div>
+
+                        <div class="proxy-fields">
+                            <div class="field">
+                                <label>Display Name</label>
+                                <input type="text" name="display_name" value="{{ app_config.proxies_display.get(proxy.name, {}).get('displayName', proxy.name) }}" 
+                                       data-proxy="{{ proxy.name }}" class="display-name-input">
+                            </div>
+                            <div class="field field-toggle">
+                                <label>Visible</label>
+                                <label class="switch">
+                                    <input type="checkbox" name="visible" 
+                                           {% if app_config.proxies_display.get(proxy.name, {}).get('visible', True) %}checked{% endif %}
+                                           data-proxy="{{ proxy.name }}" class="visible-checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="field">
+                                <label>Type</label>
+                                <select name="type" data-proxy="{{ proxy.name }}" class="type-select">
+                                    <option value="tcp" {% if proxy.type == 'tcp' %}selected{% endif %}>TCP</option>
+                                    <option value="udp" {% if proxy.type == 'udp' %}selected{% endif %}>UDP</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Local IP</label>
+                                <input type="text" name="local_ip" value="{{ proxy.localIP }}" data-proxy="{{ proxy.name }}" class="local-ip-input">
+                            </div>
+                            <div class="field">
+                                <label>Local Port</label>
+                                <input type="number" name="local_port" value="{{ proxy.localPort }}" data-proxy="{{ proxy.name }}" class="local-port-input">
+                            </div>
+                            <div class="field">
+                                <label>Remote Port</label>
+                                <input type="number" name="remote_port" value="{{ proxy.remotePort }}" data-proxy="{{ proxy.name }}" class="remote-port-input">
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="muted">暂无代理配置，请添加新代理。</p>
+                {% endif %}
+            </div>
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        function updateProxy(proxyName) {
+            const displayName = document.querySelector(`input[data-proxy="${proxyName}"].display-name-input`).value;
+            const visible = document.querySelector(`input[data-proxy="${proxyName}"].visible-checkbox`).checked;
+            const type = document.querySelector(`select[data-proxy="${proxyName}"].type-select`).value;
+            const localIp = document.querySelector(`input[data-proxy="${proxyName}"].local-ip-input`).value;
+            const localPort = document.querySelector(`input[data-proxy="${proxyName}"].local-port-input`).value;
+            const remotePort = document.querySelector(`input[data-proxy="${proxyName}"].remote-port-input`).value;
+
+            fetch('/edit_proxy/' + proxyName, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    display_name: displayName,
+                    visible: visible,
+                    type: type,
+                    local_ip: localIp,
+                    local_port: localPort,
+                    remote_port: remotePort
+                })
+            }).then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    alert('更新失败');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
