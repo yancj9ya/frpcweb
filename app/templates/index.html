@@ -45,7 +45,7 @@
                         <h3>{{ proxy.displayName }}</h3>
                         <div class="meta">本地 {{ proxy.localIP }}:{{ proxy.localPort }}</div>
                         <div class="port">远程端口 {{ proxy.remotePort }}</div>
-                        <a href="http://{{ target_ip }}:{{ proxy.localPort }}" target="_blank" role="button">打开服务</a>
+                        <a href="http://{{ target_ip }}:{{ proxy.remotePort }}" target="_blank" role="button">打开服务</a>
                     </div>
                     {% endfor %}
                 </div>
