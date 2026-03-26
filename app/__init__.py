@@ -11,6 +11,11 @@ def create_app():
     with app.app_context():
         from . import routes
 
+        try:
+            routes.start_frpc()
+        except Exception:
+            pass
+
     @app.after_request
     def after_request(response):
         if response.mimetype == "text/html":

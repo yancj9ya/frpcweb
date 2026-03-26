@@ -79,14 +79,16 @@ def start_frpc():
         return False, f"frpc 不存在: {FRPC_BIN_PATH}"
     try:
         os.chmod(FRPC_BIN_PATH, 0o755)
+        log_path = "/tmp/frpc.log"
+        log_file = open(log_path, "a", encoding="utf-8")
         process = subprocess.Popen(
             [f"{FRPC_BIN_PATH}", "-c", f"/{FRPC_TOML_PATH}"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
+            stdout=log_file,
+            stderr=log_file,
         )
         with open(FRPC_PID_PATH, "w", encoding="utf-8") as f:
             f.write(str(process.pid))
-        return True, f"frpc 已启动，PID={process.pid}"
+        return True, f"frpc 已启动，PID={process.pid}，日志: {log_path}"
     except Exception as exc:
         return False, f"启动 frpc 失败: {exc}"
 
@@ -182,6 +184,19 @@ def frpc_restart():
         return jsonify({"status": status, "message": message})
     flash(message, status)
     return redirect(url_for("settings"))
+
+
+@app.route("/frpc/log")
+def frpc_log():
+    log_path = "/tmp/frpc.log"
+    if not os.path.exists(log_path):
+        return jsonify({"status": "error", "message": "frpc 日志不存在"}), 404
+    try:
+        with open(log_path, "r", encoding="utf-8", errors="ignore") as f:
+            content = f.read()
+        return jsonify({"status": "success", "log": content[-8000:]})
+    except Exception as exc:
+        return jsonify({"status": "error", "message": f"读取日志失败: {exc}"}), 500
 
 
 @app.route("/add_proxy", methods=["POST"])
