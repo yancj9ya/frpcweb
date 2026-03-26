@@ -5,6 +5,8 @@ import os
 import signal
 import subprocess
 import time
+import threading
+import sys
 from flask import render_template, request, redirect, url_for, flash, jsonify
 from flask import current_app as app
 
@@ -82,10 +84,30 @@ def start_frpc():
         log_path = "/tmp/frpc.log"
         log_file = open(log_path, "a", encoding="utf-8")
         process = subprocess.Popen(
-            [f"{FRPC_BIN_PATH}", "-c", f"/{FRPC_TOML_PATH}"],
-            stdout=log_file,
-            stderr=log_file,
+            [f"{FRPC_BIN_PATH}", "-c", FRPC_TOML_PATH],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            bufsize=1,
         )
+
+        def _stream_logs():
+            try:
+                if process.stdout is None:
+                    return
+                for line in process.stdout:
+                    log_file.write(line)
+                    log_file.flush()
+                    sys.stdout.write(line)
+                    sys.stdout.flush()
+            finally:
+                try:
+                    log_file.close()
+                except Exception:
+                    pass
+
+        threading.Thread(target=_stream_logs, daemon=True).start()
+
         with open(FRPC_PID_PATH, "w", encoding="utf-8") as f:
             f.write(str(process.pid))
         return True, f"frpc 已启动，PID={process.pid}，日志: {log_path}"
