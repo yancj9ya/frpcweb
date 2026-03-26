@@ -2,9 +2,9 @@ version: '3.8'
 
 services:
   app:
-    build: .
-    ports:
-      - "8000:8000"
+    image: ghcr.io/yancj9ya/frpcweb:latest
+    environment:
+      - PORT=5173
     volumes:
       - ./frpc.toml:/app/frpc.toml
       - ./app_config.json:/app/app_config.json
