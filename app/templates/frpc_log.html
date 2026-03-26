@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>frpc 日志</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .log-box {
+            background: rgba(0, 0, 0, 0.85);
+            color: #e5e7eb;
+            padding: 16px;
+            border-radius: 12px;
+            overflow: auto;
+            max-height: 70vh;
+            font-family: "JetBrains Mono", monospace;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+    </style>
+</head>
+<body>
+    <nav class="container-fluid">
+        <div class="container nav-inner">
+            <div class="brand">
+                <span class="logo">FR</span>
+                <span>Frpc Configurator</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/config">Config</a></li>
+                <li><a href="/settings">Settings</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container page">
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <div class="eyebrow">frpc</div>
+                    <h2>frpc 日志</h2>
+                    <p class="muted">显示最近 8000 字符日志。</p>
+                </div>
+            </div>
+            <div class="log-box">{{ log }}</div>
+        </div>
+    </main>
+</body>
+</html>

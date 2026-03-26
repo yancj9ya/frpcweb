@@ -14,6 +14,7 @@ FRPC_TOML_PATH = "frpc.toml"
 APP_CONFIG_PATH = "app_config.json"
 FRPC_BIN_PATH = "frp/frpc"
 FRPC_PID_PATH = "/tmp/frpc.pid"
+FRPC_LOG_PATH = "/tmp/frpc.log"
 
 
 def read_config():
@@ -55,10 +56,24 @@ def write_app_config(config_data):
         flash(f"Error writing app config: {e}", "error")
 
 
+def _log_frpc(message: str):
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    line = f"[{timestamp}] {message}\n"
+    try:
+        with open(FRPC_LOG_PATH, "a", encoding="utf-8") as f:
+            f.write(line)
+    except Exception:
+        pass
+    sys.stdout.write(line)
+    sys.stdout.flush()
+
+
 def _is_process_running(pid: int) -> bool:
     try:
         os.kill(pid, 0)
         return True
+    except OSError:
+        return False
     except OSError:
         return False
 
@@ -77,12 +92,20 @@ def get_frpc_pid():
 
 
 def start_frpc():
+    running_pid = get_frpc_pid()
+    if running_pid:
+        _log_frpc(f"frpc 已在运行，PID={running_pid}，将先停止再启动")
+        ok, message = stop_frpc()
+        if not ok:
+            return False, f"启动前停止失败: {message}"
+
     if not os.path.exists(FRPC_BIN_PATH):
+        _log_frpc(f"frpc 不存在: {FRPC_BIN_PATH}")
         return False, f"frpc 不存在: {FRPC_BIN_PATH}"
+
     try:
         os.chmod(FRPC_BIN_PATH, 0o755)
-        log_path = "/tmp/frpc.log"
-        log_file = open(log_path, "a", encoding="utf-8")
+        log_file = open(FRPC_LOG_PATH, "a", encoding="utf-8")
         process = subprocess.Popen(
             [f"{FRPC_BIN_PATH}", "-c", FRPC_TOML_PATH],
             stdout=subprocess.PIPE,
@@ -90,6 +113,9 @@ def start_frpc():
             text=True,
             bufsize=1,
         )
+
+        _log_frpc(f"frpc 启动命令: {FRPC_BIN_PATH} -c {FRPC_TOML_PATH}")
+        _log_frpc(f"frpc 启动中，PID={process.pid}")
 
         def _stream_logs():
             try:
@@ -110,7 +136,10 @@ def start_frpc():
 
         with open(FRPC_PID_PATH, "w", encoding="utf-8") as f:
             f.write(str(process.pid))
-        return True, f"frpc 已启动，PID={process.pid}，日志: {log_path}"
+        return True, f"frpc 已启动，PID={process.pid}，日志: {FRPC_LOG_PATH}"
+    except Exception as exc:
+        _log_frpc(f"启动 frpc 失败: {exc}")
+        return False, f"启动 frpc 失败: {exc}"
     except Exception as exc:
         return False, f"启动 frpc 失败: {exc}"
 
@@ -118,28 +147,40 @@ def start_frpc():
 def stop_frpc():
     pid = get_frpc_pid()
     if not pid:
+        _log_frpc("frpc 未运行，无需停止")
         return True, "frpc 未运行"
     try:
+        _log_frpc(f"尝试停止 frpc，PID={pid}")
         os.kill(pid, signal.SIGTERM)
-        timeout_at = time.time() + 5
+        timeout_at = time.time() + 8
         while time.time() < timeout_at:
             if not _is_process_running(pid):
                 break
             time.sleep(0.2)
         if _is_process_running(pid):
+            _log_frpc(f"SIGTERM 超时，发送 SIGKILL，PID={pid}")
             os.kill(pid, signal.SIGKILL)
         if os.path.exists(FRPC_PID_PATH):
             os.remove(FRPC_PID_PATH)
+        _log_frpc("frpc 已停止")
         return True, "frpc 已停止"
     except Exception as exc:
+        _log_frpc(f"停止 frpc 失败: {exc}")
         return False, f"停止 frpc 失败: {exc}"
 
 
 def restart_frpc():
+    _log_frpc("开始重启 frpc")
     ok, message = stop_frpc()
     if not ok:
+        _log_frpc(f"重启失败，停止阶段错误: {message}")
         return False, message
-    return start_frpc()
+    ok, message = start_frpc()
+    if ok:
+        _log_frpc("重启完成")
+    else:
+        _log_frpc(f"重启失败，启动阶段错误: {message}")
+    return ok, message
 
 
 @app.route("/")
@@ -210,15 +251,26 @@ def frpc_restart():
 
 @app.route("/frpc/log")
 def frpc_log():
-    log_path = "/tmp/frpc.log"
-    if not os.path.exists(log_path):
+    if not os.path.exists(FRPC_LOG_PATH):
         return jsonify({"status": "error", "message": "frpc 日志不存在"}), 404
     try:
-        with open(log_path, "r", encoding="utf-8", errors="ignore") as f:
+        with open(FRPC_LOG_PATH, "r", encoding="utf-8", errors="ignore") as f:
             content = f.read()
         return jsonify({"status": "success", "log": content[-8000:]})
     except Exception as exc:
         return jsonify({"status": "error", "message": f"读取日志失败: {exc}"}), 500
+
+
+@app.route("/frpc/log/view")
+def frpc_log_view():
+    if not os.path.exists(FRPC_LOG_PATH):
+        return render_template("frpc_log.html", log="frpc 日志不存在")
+    try:
+        with open(FRPC_LOG_PATH, "r", encoding="utf-8", errors="ignore") as f:
+            content = f.read()
+        return render_template("frpc_log.html", log=content[-8000:])
+    except Exception as exc:
+        return render_template("frpc_log.html", log=f"读取日志失败: {exc}")
 
 
 @app.route("/add_proxy", methods=["POST"])
