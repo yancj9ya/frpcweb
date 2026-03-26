@@ -1,10 +1,6 @@
 {
   "target_ip": "192.168.12.1",
   "proxies_display": {
-    "alist": {
-      "displayName": "openlist121",
-      "visible": true
-    },
     "palgame": {
       "visible": false,
       "displayName": "palgame"
@@ -16,10 +12,6 @@
     "palgamet": {
       "visible": false,
       "displayName": "palgamet"
-    },
-    "ver": {
-      "visible": true,
-      "displayName": "ver"
     },
     "dst1": {
       "displayName": "dst1",
@@ -33,9 +25,33 @@
       "displayName": "Test Proxy 3",
       "visible": true
     },
-    "dst-web": {
-      "displayName": "dst-web",
-      "visible": true
+    "dst-10998": {
+      "displayName": "dst-10998",
+      "visible": false
+    },
+    "gsm-pal-udp": {
+      "displayName": "gsm-pal-udp",
+      "visible": false
+    },
+    "dst2-2-10818-u": {
+      "displayName": "dst2-2-10818-u",
+      "visible": false
+    },
+    "dst-10888-udp": {
+      "displayName": "dst-10888-udp",
+      "visible": false
+    },
+    "dst2-2-10918": {
+      "displayName": "dst2-2-10918",
+      "visible": false
+    },
+    "dst2-2-10919": {
+      "displayName": "dst2-2-10919",
+      "visible": false
+    },
+    "dst-10999": {
+      "displayName": "dst-10999",
+      "visible": false
     }
   }
 }

@@ -1,11 +1,74 @@
-serverAddr = "luckyancj.site"
+serverAddr = "yancj.dpdns.org"
 serverPort = 7000
 [[proxies]]
 name = "alist"
 type = "tcp"
 localIP = "127.0.0.1"
 localPort = 5234
-remotePort = 5233
+remotePort = 5234
+
+[[proxies]]
+name = "ssh"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 22
+remotePort = 2223
+
+[[proxies]]
+name = "webui_ip"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 5666
+remotePort = 7500
+
+[[proxies]]
+name = "palgame"
+type = "udp"
+localIP = "127.0.0.1"
+localPort = 8211
+remotePort = 8211
+
+[[proxies]]
+name = "palgamet"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 8211
+remotePort = 8211
+
+[[proxies]]
+name = "palcon"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 25575
+remotePort = 25575
+
+[[proxies]]
+name = "cloudsaver"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 8008
+remotePort = 8008
+
+[[proxies]]
+name = "mihomo"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 9090
+remotePort = 4011
+
+[[proxies]]
+name = "qlmb"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 15700
+remotePort = 15700
+
+[[proxies]]
+name = "115sub"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 8899
+remotePort = 8899
 
 [[proxies]]
 name = "ver"
@@ -15,71 +78,201 @@ localPort = 8999
 remotePort = 8999
 
 [[proxies]]
-name = "fetchbuild"
+name = "gemini"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 8055
+remotePort = 8055
+
+[[proxies]]
+name = "panso"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 18888
+remotePort = 18888
+
+[[proxies]]
+name = "gsm"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 13001
+remotePort = 13001
+
+[[proxies]]
+name = "gsm-pal"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 18222
+remotePort = 8212
+
+[[proxies]]
+name = "gsm-pal-udp"
+type = "udp"
+localIP = "127.0.0.1"
+localPort = 18222
+remotePort = 8212
+
+[[proxies]]
+name = "qqbot"
 type = "tcp"
 localIP = "127.0.0.1"
 localPort = 8068
-remotePort = 5000
+remotePort = 8068
 
 [[proxies]]
-name = "dst1"
+name = "qqvnc"
 type = "tcp"
 localIP = "127.0.0.1"
-localPort = 1092
-remotePort = 13998
+localPort = 6080
+remotePort = 6080
 
 [[proxies]]
-name = "dst2"
+name = "189autosave"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 3011
+remotePort = 3011
+
+[[proxies]]
+name = "qbot_http"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 3000
+remotePort = 3000
+
+[[proxies]]
+name = "hyperms"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 8115
+remotePort = 8115
+
+[[proxies]]
+name = "frogdoc"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 7181
+remotePort = 7181
+
+[[proxies]]
+name = "qbotweb"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 13080
+remotePort = 13080
+
+[[proxies]]
+name = "dst-web"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 18080
+remotePort = 18080
+
+[[proxies]]
+name = "frp-web"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 5173
+remotePort = 5173
+
+[[proxies]]
+name = "dst-10999"
 type = "udp"
 localIP = "127.0.0.1"
 localPort = 10999
 remotePort = 10999
 
 [[proxies]]
-name = "dst-web"
+name = "dst-10888-tcp"
 type = "tcp"
 localIP = "127.0.0.1"
-localPort = 18081
-remotePort = 18082
+localPort = 10888
+remotePort = 10888
 
 [[proxies]]
-name = "test"
-type = "tcp"
-localIP = "127.0.0.1"
-localPort = 8080
-remotePort = 8080
-
-[[proxies]]
-name = "test2"
-type = "tcp"
-localIP = "127.0.0.1"
-localPort = 8081
-remotePort = 8081
-
-[[proxies]]
-name = "test3"
+name = "dst-10888-udp"
 type = "udp"
 localIP = "127.0.0.1"
-localPort = 9091
-remotePort = 9091
+localPort = 10888
+remotePort = 10888
 
 [[proxies]]
-name = "212"
+name = "dst-10998"
 type = "udp"
 localIP = "127.0.0.1"
-localPort = 121
-remotePort = 212
+localPort = 10998
+remotePort = 10998
 
 [[proxies]]
-name = "231"
+name = "dst2-2-10919"
+type = "udp"
+localIP = "127.0.0.1"
+localPort = 10919
+remotePort = 10919
+
+[[proxies]]
+name = "dst2-2-10918"
+type = "udp"
+localIP = "127.0.0.1"
+localPort = 10918
+remotePort = 10918
+
+[[proxies]]
+name = "dst2-2-10818-t"
 type = "tcp"
 localIP = "127.0.0.1"
-localPort = 313
-remotePort = 133
+localPort = 10818
+remotePort = 10818
+
+[[proxies]]
+name = "dst2-2-10818-u"
+type = "udp"
+localIP = "127.0.0.1"
+localPort = 10818
+remotePort = 10818
+
+[[proxies]]
+name = "AIAPI"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 3123
+remotePort = 3123
+
+[[proxies]]
+name = "Note"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 5231
+remotePort = 5231
+
+[[proxies]]
+name = "LXMUSIC"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 9527
+remotePort = 9527
+
+[[proxies]]
+name = "tgtodrive"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 12366
+remotePort = 12366
+
+[[proxies]]
+name = "pansoub"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 18887
+remotePort = 18887
+
+[[proxies]]
+name = "codex_register"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 1455
+remotePort = 1455
 
 [auth]
 method = "token"
-token = "tokenyancj"
-
-[transport.tls]
-enable = false
+token = "bkwzsyzy"

@@ -13,8 +13,8 @@ from flask import current_app as app
 FRPC_TOML_PATH = "frpc.toml"
 APP_CONFIG_PATH = "app_config.json"
 FRPC_BIN_PATH = "frp/frpc"
-FRPC_PID_PATH = "/tmp/frpc.pid"
-FRPC_LOG_PATH = "/tmp/frpc.log"
+FRPC_PID_PATH = "logs/frpc.pid"
+FRPC_LOG_PATH = "logs/frpc.log"
 
 
 def read_config():
@@ -56,7 +56,15 @@ def write_app_config(config_data):
         flash(f"Error writing app config: {e}", "error")
 
 
+def _ensure_frpc_dirs():
+    for path in (FRPC_LOG_PATH, FRPC_PID_PATH):
+        dir_path = os.path.dirname(path)
+        if dir_path:
+            os.makedirs(dir_path, exist_ok=True)
+
+
 def _log_frpc(message: str):
+    _ensure_frpc_dirs()
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     line = f"[{timestamp}] {message}\n"
     try:
@@ -105,6 +113,7 @@ def start_frpc():
 
     try:
         os.chmod(FRPC_BIN_PATH, 0o755)
+        _ensure_frpc_dirs()
         log_file = open(FRPC_LOG_PATH, "a", encoding="utf-8")
         process = subprocess.Popen(
             [f"{FRPC_BIN_PATH}", "-c", FRPC_TOML_PATH],
@@ -214,9 +223,32 @@ def config():
     frpc_config = read_config()
     app_config = read_app_config()
     now = datetime.datetime.now().timestamp()
+
+    proxies = []
+    for proxy in frpc_config.get("proxies", []):
+        display_settings = app_config.get("proxies_display", {}).get(
+            proxy.get("name", ""),
+            {"visible": True, "displayName": proxy.get("name", "")},
+        )
+        proxy_info = proxy.copy()
+        proxy_info["displayName"] = display_settings.get(
+            "displayName", proxy.get("name", "")
+        )
+        proxy_info["visible"] = display_settings.get("visible", True)
+        proxies.append(proxy_info)
+
+    proxies.sort(
+        key=lambda item: (
+            item.get("remotePort") or 0,
+            item.get("localIP") or "",
+            item.get("localPort") or 0,
+            item.get("type") or "",
+        )
+    )
+
     return render_template(
         "config.html",
-        proxies=frpc_config.get("proxies", []),
+        proxies=proxies,
         app_config=app_config,
         now=now,
     )
@@ -286,7 +318,7 @@ def add_proxy():
         "remotePort": int(request.form["remote_port"]),
     }
 
-    proxies.append(new_proxy)
+    proxies.insert(0, new_proxy)
     config["proxies"] = proxies
     write_config(config)
 

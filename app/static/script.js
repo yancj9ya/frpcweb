@@ -3,6 +3,100 @@ document.addEventListener('DOMContentLoaded', () => {
     const mobileMenu = document.getElementById('mobile-menu');
     const navLinks = document.querySelector('.nav-links');
 
+    // 添加代理弹窗
+    const addModal = document.getElementById('add-proxy-modal');
+    const openAddModal = document.getElementById('open-add-modal');
+    const closeAddModal = document.getElementById('close-add-modal');
+    const cancelAddModal = document.getElementById('cancel-add-modal');
+
+    const closeModal = () => {
+        if (!addModal) return;
+        addModal.classList.remove('is-open');
+        addModal.setAttribute('aria-hidden', 'true');
+    };
+
+    const openModal = () => {
+        if (!addModal) return;
+        addModal.classList.add('is-open');
+        addModal.setAttribute('aria-hidden', 'false');
+    };
+
+    if (openAddModal) {
+        openAddModal.addEventListener('click', openModal);
+    }
+
+    if (closeAddModal) {
+        closeAddModal.addEventListener('click', closeModal);
+    }
+
+    if (cancelAddModal) {
+        cancelAddModal.addEventListener('click', closeModal);
+    }
+
+    if (addModal) {
+        addModal.addEventListener('click', (event) => {
+            if (event.target === addModal) {
+                closeModal();
+            }
+        });
+    }
+
+    // 代理列表筛选
+    const filterChips = document.querySelectorAll('.filter-chip');
+    const proxyList = document.getElementById('proxy-list');
+    if (filterChips.length && proxyList) {
+        const applyFilters = () => {
+            const activeFilters = Array.from(filterChips)
+                .filter(chip => chip.classList.contains('is-active'))
+                .map(chip => chip.dataset.filter);
+
+            const items = proxyList.querySelectorAll('.proxy-item');
+            items.forEach(item => {
+                const types = (item.dataset.types || '').trim().split(/\s+/).filter(Boolean);
+                const groupVisible = item.dataset.visible === 'true';
+
+                const matchesAll = activeFilters.every(filter => {
+                    if (filter === 'all') {
+                        return true;
+                    }
+                    if (filter === 'tcp' || filter === 'udp') {
+                        return types.includes(filter);
+                    }
+                    if (filter === 'visible') {
+                        return groupVisible;
+                    }
+                    if (filter === 'hidden') {
+                        return !groupVisible;
+                    }
+                    return true;
+                });
+
+                item.style.display = matchesAll ? '' : 'none';
+            });
+        };
+
+        filterChips.forEach(chip => {
+            chip.addEventListener('click', () => {
+                if (chip.dataset.filter === 'all') {
+                    const isActive = chip.classList.contains('is-active');
+                    filterChips.forEach(other => other.classList.remove('is-active'));
+                    if (!isActive) {
+                        chip.classList.add('is-active');
+                    }
+                } else {
+                    chip.classList.toggle('is-active');
+                    const allChip = document.querySelector('.filter-chip[data-filter="all"]');
+                    if (allChip) {
+                        allChip.classList.remove('is-active');
+                    }
+                }
+                applyFilters();
+            });
+        });
+
+        applyFilters();
+    }
+
     if (mobileMenu && navLinks) {
         mobileMenu.addEventListener('click', function () {
             navLinks.classList.toggle('open');

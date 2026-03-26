@@ -27,98 +27,112 @@
     </nav>
 
     <main class="container page config-page">
-        <section class="card hero">
-            <div class="card-header">
-                <div>
-                    <div class="eyebrow">Control Center</div>
-                    <h2 class="hero-title">代理管理台</h2>
-                    <p class="muted">添加、编辑与发布你的 frp 代理配置。</p>
-                </div>
-                <div class="hero-meta">共 {{ proxies|length }} 个代理</div>
-            </div>
-        </section>
-
         <section class="config-layout">
-            <div class="card config-create">
-                <div class="card-header">
-                    <div>
-                        <div class="eyebrow">Create</div>
-                        <h2>添加代理</h2>
-                        <p class="muted">快速创建新的代理条目。</p>
-                    </div>
-                </div>
-                <form method="POST" action="/add_proxy" class="stack">
-                    <div class="grid">
-                        <input type="text" name="name" placeholder="Proxy Name" required>
-                        <select name="type" required>
-                            <option value="" disabled selected>Select Type</option>
-                            <option value="tcp">TCP</option>
-                            <option value="udp">UDP</option>
-                        </select>
-                        <input type="text" name="local_ip" placeholder="Local IP" value="127.0.0.1" required>
-                        <input type="number" name="local_port" placeholder="Local Port" required>
-                        <input type="number" name="remote_port" placeholder="Remote Port" required>
-                    </div>
-                    <button type="submit">添加代理</button>
-                </form>
-            </div>
-
             <div class="card config-manage">
                 <div class="card-header">
                     <div>
                         <div class="eyebrow">Manage</div>
                         <h2>代理配置列表</h2>
-                        <p class="muted">逐条编辑并立即更新配置。</p>
+                        <p class="muted">同端口 TCP/UDP 合并展示。</p>
+                    </div>
+                    <div class="header-actions">
+                        <div class="hero-meta">共 {{ proxies|length }} 个代理</div>
+                        <button type="button" class="icon-button" id="open-add-modal" aria-label="添加代理">+</button>
                     </div>
                 </div>
+
+                <div class="modal-overlay" id="add-proxy-modal" aria-hidden="true">
+                    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="add-proxy-title">
+                        <div class="modal-header">
+                            <h3 id="add-proxy-title">添加代理</h3>
+                            <button type="button" class="icon-button ghost" id="close-add-modal" aria-label="关闭">×</button>
+                        </div>
+                        <form method="POST" action="/add_proxy" class="stack">
+                            <div class="grid">
+                                <input type="text" name="name" placeholder="Proxy Name" required>
+                                <div class="field radio-field">
+                                    <label>Type</label>
+                                    <div class="radio-group">
+                                        <label class="radio-chip">
+                                            <input type="radio" name="type" value="tcp" required>
+                                            <span>TCP</span>
+                                        </label>
+                                        <label class="radio-chip">
+                                            <input type="radio" name="type" value="udp" required>
+                                            <span>UDP</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <input type="text" name="local_ip" placeholder="Local IP" value="127.0.0.1" required>
+                                <input type="number" name="local_port" placeholder="Local Port" required>
+                                <input type="number" name="remote_port" placeholder="Remote Port" required>
+                            </div>
+                            <div class="modal-actions">
+                                <button type="button" class="secondary" id="cancel-add-modal">取消</button>
+                                <button type="submit">添加代理</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="filter-toolbar">
+                    <button type="button" class="filter-chip is-active" data-filter="all">全部</button>
+                    <button type="button" class="filter-chip" data-filter="tcp">TCP</button>
+                    <button type="button" class="filter-chip" data-filter="udp">UDP</button>
+                    <button type="button" class="filter-chip" data-filter="visible">Visible</button>
+                    <button type="button" class="filter-chip" data-filter="hidden">Unvisible</button>
+                </div>
+
                 {% if proxies %}
-                <div class="proxy-list">
+                <div class="proxy-list" id="proxy-list">
                     {% for proxy in proxies %}
-                    <div class="proxy-item fade-in">
+                    <div class="proxy-item fade-in" data-types="{{ proxy.type }}" data-visible="{% if proxy.visible %}true{% else %}false{% endif %}">
                         <div class="proxy-item-header">
                             <div class="proxy-title">
-                                <span class="badge">{{ proxy.type.upper() }}</span>
-                                <h3>{{ proxy.name }}</h3>
+                                <span class="badge">{{ proxy.type|upper }}</span>
+                                <h3>{{ proxy.localIP }}:{{ proxy.localPort }}</h3>
                             </div>
-                            <div class="proxy-actions">
+                            <div class="proxy-header-actions">
                                 <button onclick="updateProxy('{{ proxy.name }}')" class="secondary">更新</button>
                                 <a href="/delete_proxy/{{ proxy.name }}" class="warning delete-btn" onclick="return confirm('确定要删除这个代理吗？此操作无法撤销')">删除</a>
                             </div>
                         </div>
 
-                        <div class="proxy-fields">
-                            <div class="field">
-                                <label>Display Name</label>
-                                <input type="text" name="display_name" value="{{ app_config.proxies_display.get(proxy.name, {}).get('displayName', proxy.name) }}" 
-                                       data-proxy="{{ proxy.name }}" class="display-name-input">
-                            </div>
-                            <div class="field field-toggle">
-                                <label>Visible</label>
-                                <label class="switch">
-                                    <input type="checkbox" name="visible" 
-                                           {% if app_config.proxies_display.get(proxy.name, {}).get('visible', True) %}checked{% endif %}
-                                           data-proxy="{{ proxy.name }}" class="visible-checkbox">
-                                    <span class="slider"></span>
-                                </label>
-                            </div>
-                            <div class="field">
-                                <label>Type</label>
-                                <select name="type" data-proxy="{{ proxy.name }}" class="type-select">
-                                    <option value="tcp" {% if proxy.type == 'tcp' %}selected{% endif %}>TCP</option>
-                                    <option value="udp" {% if proxy.type == 'udp' %}selected{% endif %}>UDP</option>
-                                </select>
-                            </div>
-                            <div class="field">
-                                <label>Local IP</label>
-                                <input type="text" name="local_ip" value="{{ proxy.localIP }}" data-proxy="{{ proxy.name }}" class="local-ip-input">
-                            </div>
-                            <div class="field">
-                                <label>Local Port</label>
-                                <input type="number" name="local_port" value="{{ proxy.localPort }}" data-proxy="{{ proxy.name }}" class="local-port-input">
-                            </div>
-                            <div class="field">
-                                <label>Remote Port</label>
-                                <input type="number" name="remote_port" value="{{ proxy.remotePort }}" data-proxy="{{ proxy.name }}" class="remote-port-input">
+                        <div class="proxy-group-items">
+                            <div class="proxy-fields" data-type="{{ proxy.type }}" data-visible="{% if proxy.visible %}true{% else %}false{% endif %}">
+                                <div class="field">
+                                    <label>Display Name</label>
+                                    <input type="text" name="display_name" value="{{ proxy.displayName }}"
+                                           data-proxy="{{ proxy.name }}" class="display-name-input">
+                                </div>
+                                <div class="field field-toggle">
+                                    <label>Visible</label>
+                                    <label class="switch">
+                                        <input type="checkbox" name="visible"
+                                               {% if proxy.visible %}checked{% endif %}
+                                               data-proxy="{{ proxy.name }}" class="visible-checkbox">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                <div class="field">
+                                    <label>Local Port</label>
+                                    <input type="number" name="local_port" value="{{ proxy.localPort }}" data-proxy="{{ proxy.name }}" class="local-port-input">
+                                </div>
+                                <div class="field">
+                                    <label>Local IP</label>
+                                    <input type="text" name="local_ip" value="{{ proxy.localIP }}" data-proxy="{{ proxy.name }}" class="local-ip-input">
+                                </div>
+                                <div class="field type-field">
+                                    <label>Type</label>
+                                    <select name="type" data-proxy="{{ proxy.name }}" class="type-select">
+                                        <option value="tcp" {% if proxy.type == 'tcp' %}selected{% endif %}>TCP</option>
+                                        <option value="udp" {% if proxy.type == 'udp' %}selected{% endif %}>UDP</option>
+                                    </select>
+                                </div>
+                                <div class="field">
+                                    <label>Remote Port</label>
+                                    <input type="number" name="remote_port" value="{{ proxy.remotePort }}" data-proxy="{{ proxy.name }}" class="remote-port-input">
+                                </div>
                             </div>
                         </div>
                     </div>

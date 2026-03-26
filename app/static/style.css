@@ -131,7 +131,7 @@ nav.container-fluid {
 
 .config-layout {
   display: grid;
-  grid-template-columns: minmax(260px, 0.9fr) minmax(0, 2.1fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 20px;
 }
 
@@ -143,6 +143,7 @@ nav.container-fluid {
 .proxy-list {
   display: grid;
   gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .proxy-item {
@@ -163,12 +164,34 @@ nav.container-fluid {
   background: radial-gradient(260px 120px at top right, rgba(14, 165, 160, 0.15), transparent 60%);
   pointer-events: none;
 }
-
 .proxy-item-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 12px;
+}
+
+.proxy-header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.inline-switch {
+  width: 46px;
+  height: 26px;
+}
+
+.inline-switch .slider::before {
+  width: 18px;
+  height: 18px;
+  top: 4px;
+  left: 4px;
+}
+
+.inline-switch input:checked + .slider::before {
+  transform: translateX(18px);
 }
 
 .proxy-title {
@@ -190,8 +213,44 @@ nav.container-fluid {
 
 .proxy-fields {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 10px 12px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px dashed rgba(20, 26, 34, 0.12);
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.proxy-fields .field {
+  min-width: 0;
+}
+
+.proxy-fields .field:nth-child(1) {
+  grid-column: span 4;
+}
+
+.proxy-fields .field:nth-child(2) {
+  grid-column: span 3;
+}
+
+.proxy-fields .field:nth-child(3) {
+  grid-column: span 3;
+}
+
+.proxy-fields .field:nth-child(4) {
+  grid-column: span 4;
+}
+
+.proxy-fields .field:nth-child(5) {
+  grid-column: span 3;
+}
+
+.proxy-fields .field:nth-child(6) {
+  grid-column: span 3;
+}
+.proxy-group-items {
+  display: grid;
+  gap: 14px;
 }
 
 .field label {
@@ -205,6 +264,81 @@ nav.container-fluid {
 .field-toggle {
   display: grid;
   gap: 6px;
+  justify-items: center;
+}
+
+.type-field {
+  text-align: center;
+}
+
+.type-field select {
+  width: 80%;
+  margin: 0 auto;
+}
+
+.radio-field {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.radio-field label {
+  margin: 0;
+}
+
+.radio-group {
+  display: inline-flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.radio-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(20, 26, 34, 0.2);
+  background: rgba(255, 255, 255, 0.8);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition), box-shadow var(--transition), border-color var(--transition);
+}
+
+.radio-chip input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.radio-chip input:checked + span {
+  color: #fff;
+}
+
+.radio-chip input:checked ~ span,
+.radio-chip input:checked + span,
+.radio-chip input:checked {
+  filter: none;
+}
+
+.radio-chip input:checked + span {
+  text-shadow: none;
+}
+
+.radio-chip input:checked + span,
+.radio-chip input:checked ~ span {
+  color: #fff;
+}
+
+.radio-chip:has(input:checked) {
+  background: linear-gradient(135deg, var(--primary), var(--primary-2));
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 8px 18px rgba(14, 165, 160, 0.22);
 }
 
 .switch {
@@ -251,6 +385,32 @@ nav.container-fluid {
   transform: translateX(22px);
 }
 
+.filter-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.filter-chip {
+  border: 1px solid rgba(20, 26, 34, 0.2);
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition), box-shadow var(--transition), border-color var(--transition);
+}
+
+.filter-chip.is-active {
+  background: linear-gradient(135deg, var(--primary), var(--primary-2));
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 8px 18px rgba(14, 165, 160, 0.22);
+}
+
 .card {
   background: var(--glass);
   border: 1px solid var(--border);
@@ -258,6 +418,62 @@ nav.container-fluid {
   box-shadow: var(--shadow);
   padding: 24px;
   backdrop-filter: blur(6px);
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px;
+  z-index: 40;
+  overflow-y: auto;
+}
+
+.modal-overlay.is-open {
+  display: flex;
+}
+
+.modal-card {
+  width: min(720px, 100%);
+  background: #fff;
+  border-radius: var(--radius);
+  border: 1px solid rgba(20, 26, 34, 0.12);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.icon-button {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  padding: 0;
+  min-width: 40px;
+}
+
+.icon-button.ghost {
+  background: transparent;
+  border: 1px solid rgba(20, 26, 34, 0.2);
+  color: var(--ink);
 }
 
 .card + .card {
@@ -491,7 +707,7 @@ tbody tr:hover {
 
 .proxy-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
   gap: 16px;
 }
 
@@ -501,7 +717,7 @@ tbody tr:hover {
   border-radius: var(--radius);
   padding: 18px;
   display: grid;
-  gap: 8px;
+  gap: 10px;
   text-align: left;
   position: relative;
   overflow: hidden;
@@ -524,6 +740,19 @@ tbody tr:hover {
 .proxy-card h3 {
   margin: 0;
   font-size: 1.1rem;
+}
+
+.proxy-name {
+  font-size: 1.65rem;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+}
+
+.badge-top {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 1;
 }
 
 .proxy-card .meta {
@@ -606,6 +835,23 @@ ul {
 
   .config-layout {
     grid-template-columns: 1fr;
+  }
+
+  .proxy-list {
+    grid-template-columns: 1fr;
+  }
+
+  .proxy-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .proxy-fields .field:nth-child(1),
+  .proxy-fields .field:nth-child(2),
+  .proxy-fields .field:nth-child(3),
+  .proxy-fields .field:nth-child(4),
+  .proxy-fields .field:nth-child(5),
+  .proxy-fields .field:nth-child(6) {
+    grid-column: span 2;
   }
 
   .proxy-item-header {
