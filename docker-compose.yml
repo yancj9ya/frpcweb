@@ -2,19 +2,11 @@ version: '3.8'
 
 services:
   app:
-    image: ghcr.io/yancj9ya/frpcweb:latest
+    build: .
     ports:
       - "8000:8000"
     volumes:
       - ./frpc.toml:/app/frpc.toml
       - ./app_config.json:/app/app_config.json
-    restart: always
-
-  frpc:
-    image: snowdreamtech/frpc
-    volumes:
-      - ./frpc.toml:/etc/frp/frpc.toml
     network_mode: "host"
     restart: always
-    depends_on:
-      - app

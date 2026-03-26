@@ -1,11 +1,17 @@
 import toml
 import json
 import datetime
+import os
+import signal
+import subprocess
+import time
 from flask import render_template, request, redirect, url_for, flash, jsonify
 from flask import current_app as app
 
 FRPC_TOML_PATH = "frpc.toml"
 APP_CONFIG_PATH = "app_config.json"
+FRPC_BIN_PATH = "frp/frpc"
+FRPC_PID_PATH = "/tmp/frpc.pid"
 
 
 def read_config():
@@ -45,6 +51,71 @@ def write_app_config(config_data):
         flash("App config saved successfully!", "success")
     except Exception as e:
         flash(f"Error writing app config: {e}", "error")
+
+
+def _is_process_running(pid: int) -> bool:
+    try:
+        os.kill(pid, 0)
+        return True
+    except OSError:
+        return False
+
+
+def get_frpc_pid():
+    if not os.path.exists(FRPC_PID_PATH):
+        return None
+    try:
+        with open(FRPC_PID_PATH, "r", encoding="utf-8") as f:
+            pid = int(f.read().strip())
+        if _is_process_running(pid):
+            return pid
+    except Exception:
+        return None
+    return None
+
+
+def start_frpc():
+    if not os.path.exists(FRPC_BIN_PATH):
+        return False, f"frpc 不存在: {FRPC_BIN_PATH}"
+    try:
+        os.chmod(FRPC_BIN_PATH, 0o755)
+        process = subprocess.Popen(
+            [f"{FRPC_BIN_PATH}", "-c", f"/{FRPC_TOML_PATH}"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        with open(FRPC_PID_PATH, "w", encoding="utf-8") as f:
+            f.write(str(process.pid))
+        return True, f"frpc 已启动，PID={process.pid}"
+    except Exception as exc:
+        return False, f"启动 frpc 失败: {exc}"
+
+
+def stop_frpc():
+    pid = get_frpc_pid()
+    if not pid:
+        return True, "frpc 未运行"
+    try:
+        os.kill(pid, signal.SIGTERM)
+        timeout_at = time.time() + 5
+        while time.time() < timeout_at:
+            if not _is_process_running(pid):
+                break
+            time.sleep(0.2)
+        if _is_process_running(pid):
+            os.kill(pid, signal.SIGKILL)
+        if os.path.exists(FRPC_PID_PATH):
+            os.remove(FRPC_PID_PATH)
+        return True, "frpc 已停止"
+    except Exception as exc:
+        return False, f"停止 frpc 失败: {exc}"
+
+
+def restart_frpc():
+    ok, message = stop_frpc()
+    if not ok:
+        return False, message
+    return start_frpc()
 
 
 @app.route("/")
@@ -101,6 +172,16 @@ def settings():
         target_ip=app_config.get("target_ip", "127.0.0.1"),
         now=now,
     )
+
+
+@app.route("/frpc/restart", methods=["POST"])
+def frpc_restart():
+    ok, message = restart_frpc()
+    status = "success" if ok else "error"
+    if request.is_json:
+        return jsonify({"status": status, "message": message})
+    flash(message, status)
+    return redirect(url_for("settings"))
 
 
 @app.route("/add_proxy", methods=["POST"])
