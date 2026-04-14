@@ -278,7 +278,7 @@ def frpc_restart():
     if request.is_json:
         return jsonify({"status": status, "message": message})
     flash(message, status)
-    return redirect(url_for("settings"))
+    return redirect(url_for("home"))
 
 
 @app.route("/frpc/log")

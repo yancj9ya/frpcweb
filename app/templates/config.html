@@ -91,7 +91,7 @@
                         <div class="proxy-item-header">
                             <div class="proxy-title">
                                 <span class="badge">{{ proxy.type|upper }}</span>
-                                <h3>{{ proxy.localIP }}:{{ proxy.localPort }}</h3>
+                                <h3><strong>{{ proxy.name }}</strong></h3>
                             </div>
                             <div class="proxy-header-actions">
                                 <button onclick="updateProxy('{{ proxy.name }}')" class="secondary">更新</button>
