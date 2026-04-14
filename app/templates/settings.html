@@ -51,10 +51,12 @@
                     <p class="muted">修改配置后可在此重启 frpc。</p>
                 </div>
             </div>
-            <form method="POST" action="/frpc/restart" onsubmit="return confirm('确定要重启 frpc 服务吗？')">
+            <form method="POST" action="/frpc/restart" target="frpc-restart-frame" onsubmit="if(!confirm('确定要重启 frpc 服务吗？')) return false; setTimeout(function(){ window.location.href='{{ direct_home_url }}'; }, 300); return true;">
                 <button type="submit" class="warning">重启 frpc</button>
             </form>
-            <div style="margin-top: 12px;">
+            <iframe name="frpc-restart-frame" style="display:none;"></iframe>
+            <div style="margin-top: 12px; display: flex; gap: 12px; flex-wrap: wrap;">
+                <a href="{{ direct_home_url }}" role="button">打开主页</a>
                 <a href="/frpc/log/view" role="button" class="secondary" target="_blank">查看 frpc 日志</a>
             </div>
         </div>

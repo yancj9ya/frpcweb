@@ -264,9 +264,13 @@ def settings():
         return redirect(url_for("settings"))
 
     app_config = read_app_config()
+    target_ip = app_config.get("target_ip", "127.0.0.1")
+    current_port = request.host.split(":", 1)[1] if ":" in request.host else "8000"
+    direct_home_url = f"http://{target_ip}:{current_port}/"
     return render_template(
         "settings.html",
-        target_ip=app_config.get("target_ip", "127.0.0.1"),
+        target_ip=target_ip,
+        direct_home_url=direct_home_url,
         now=now,
     )
 
